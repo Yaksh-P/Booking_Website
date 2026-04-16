@@ -1,0 +1,45 @@
+CREATE TABLE users (
+  id VARCHAR(50) PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  role VARCHAR(20) NOT NULL CHECK (role IN ('CUSTOMER', 'ADMIN')),
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE services (
+  id VARCHAR(50) PRIMARY KEY,
+  name VARCHAR(150) NOT NULL,
+  description TEXT NOT NULL,
+  duration_minutes INTEGER NOT NULL,
+  price DECIMAL(10, 2) NOT NULL,
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE time_slots (
+  id VARCHAR(50) PRIMARY KEY,
+  service_id VARCHAR(50) NOT NULL REFERENCES services(id),
+  booking_date DATE NOT NULL,
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  capacity INTEGER NOT NULL CHECK (capacity > 0),
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE bookings (
+  id VARCHAR(50) PRIMARY KEY,
+  reference VARCHAR(20) NOT NULL UNIQUE,
+  service_id VARCHAR(50) NOT NULL REFERENCES services(id),
+  time_slot_id VARCHAR(50) NOT NULL REFERENCES time_slots(id),
+  status VARCHAR(20) NOT NULL CHECK (status IN ('PENDING', 'CONFIRMED', 'DECLINED', 'CANCELLED')),
+  customer_type VARCHAR(20) NOT NULL CHECK (customer_type IN ('GUEST', 'REGISTERED')),
+  user_id VARCHAR(50) NULL REFERENCES users(id),
+  guest_name VARCHAR(120) NOT NULL,
+  guest_email VARCHAR(255) NOT NULL,
+  guest_phone VARCHAR(30),
+  notes TEXT,
+  admin_notes TEXT,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

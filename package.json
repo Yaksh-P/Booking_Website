@@ -1,0 +1,27 @@
+{
+  "name": "booking_web_application",
+  "version": "1.0.0",
+  "description": "Backend API for a booking website final project",
+  "main": "dist/src/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "start": "node dist/src/index.js",
+    "test": "npm run build && node --test --test-isolation=none --experimental-test-coverage --test-coverage-exclude=dist/tests/** --test-coverage-exclude=dist/src/index.js dist/tests/**/*.test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.0",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.5.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^6.0.2"
+  }
+}

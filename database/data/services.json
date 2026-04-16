@@ -1,0 +1,20 @@
+[
+  {
+    "id": "svc-hair-styling",
+    "name": "Hair Styling Session",
+    "description": "A 60 minute salon appointment.",
+    "durationMinutes": 60,
+    "price": 65,
+    "isActive": true,
+    "createdAt": "2026-04-01T10:00:00.000Z"
+  },
+  {
+    "id": "svc-relax-massage",
+    "name": "Relaxation Massage",
+    "description": "A 60 minute massage service.",
+    "durationMinutes": 60,
+    "price": 90,
+    "isActive": true,
+    "createdAt": "2026-04-01T10:05:00.000Z"
+  }
+]

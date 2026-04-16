@@ -1,0 +1,38 @@
+[
+  {
+    "id": "slot-100",
+    "serviceId": "svc-hair-styling",
+    "date": "2026-04-10",
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "capacity": 2,
+    "createdAt": "2026-04-01T11:00:00.000Z"
+  },
+  {
+    "id": "slot-101",
+    "serviceId": "svc-hair-styling",
+    "date": "2026-04-10",
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "capacity": 2,
+    "createdAt": "2026-04-01T11:05:00.000Z"
+  },
+  {
+    "id": "slot-200",
+    "serviceId": "svc-relax-massage",
+    "date": "2026-04-11",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "capacity": 1,
+    "createdAt": "2026-04-01T11:10:00.000Z"
+  },
+  {
+    "id": "slot-201",
+    "serviceId": "svc-relax-massage",
+    "date": "2026-04-11",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "capacity": 1,
+    "createdAt": "2026-04-01T11:15:00.000Z"
+  }
+]

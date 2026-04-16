@@ -1,0 +1,41 @@
+[
+  {
+    "serviceId": "svc-hair-styling",
+    "timeSlotId": "slot-101",
+    "status": "CONFIRMED",
+    "customerType": "REGISTERED",
+    "userId": "c88dd93c-a499-4cf5-9cd7-05b203b43925",
+    "guestName": "Test User2",
+    "guestEmail": "metoo@exampple.com",
+    "reference": "BK-GL9CLM",
+    "id": "41caa643-67af-40b1-8d78-7573fc06eb3b",
+    "createdAt": "2026-04-06T03:47:22.457Z",
+    "updatedAt": "2026-04-06T03:50:21.418Z",
+    "adminNotes": "Approved by admin (updated by user-admin-1)"
+  },
+  {
+    "serviceId": "svc-hair-styling",
+    "timeSlotId": "slot-101",
+    "status": "PENDING",
+    "customerType": "REGISTERED",
+    "userId": "f03a6b05-4f2e-4c2f-90f8-100c5d33281c",
+    "guestName": "Test User",
+    "guestEmail": "testuser@example.com",
+    "reference": "BK-43IXZU",
+    "id": "8582e4f8-1194-440d-b5e6-f09be927aa29",
+    "createdAt": "2026-04-06T03:26:54.915Z",
+    "updatedAt": "2026-04-06T03:26:54.915Z"
+  },
+  {
+    "serviceId": "svc-hair-styling",
+    "timeSlotId": "slot-100",
+    "status": "CANCELLED",
+    "customerType": "GUEST",
+    "guestName": "Guest User",
+    "guestEmail": "guest@example.com",
+    "reference": "BK-7RFIFU",
+    "id": "4ad31efe-9a53-4ecf-8e09-9b2208c1edd7",
+    "createdAt": "2026-04-06T03:20:26.346Z",
+    "updatedAt": "2026-04-06T03:24:50.345Z"
+  }
+]

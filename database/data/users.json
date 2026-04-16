@@ -1,0 +1,34 @@
+[
+  {
+    "id": "user-admin-1",
+    "name": "System Admin",
+    "email": "admin@booking.local",
+    "passwordHash": "seed-admin-salt:be1f0b04040443d2b47eb6ab1e5aaec58b73cf669af5d3a5875afb8ed4cc9e161cf9b9538db0ccb70cd8fd6ca2df096fc6f81a41d7b810f19b8d234af1bface0",
+    "role": "ADMIN",
+    "createdAt": "2026-04-01T09:00:00.000Z"
+  },
+  {
+    "id": "user-customer-1",
+    "name": "Jane Customer",
+    "email": "jane@example.com",
+    "passwordHash": "seed-customer-salt:4f0f9982d3aaad07c61ab15fe6881fd5313d2c0022f7431d9c0e9e8bad88a4b22fe25614bc221b5e965f7ebc4c17a83af7565f907149825968351dc09594e269",
+    "role": "CUSTOMER",
+    "createdAt": "2026-04-01T09:10:00.000Z"
+  },
+  {
+    "name": "Test User",
+    "email": "testuser@example.com",
+    "passwordHash": "845bbb38d8019720df16fecc0e3d91e0:952a8f0c21af6210d74268edf65fc117f0cbb44db1fbd44ea98d55ca59af2c042bd5c90cb58363a9f9d0aa58b89aab8078bc503c7717d3e600cd774ba91a228b",
+    "role": "CUSTOMER",
+    "id": "f03a6b05-4f2e-4c2f-90f8-100c5d33281c",
+    "createdAt": "2026-04-06T03:02:48.768Z"
+  },
+  {
+    "name": "Test User2",
+    "email": "metoo@exampple.com",
+    "passwordHash": "b6db05798e15526ee1f781b331b3e910:4a18befb928efb4075e4216ea66b668cd86d6e7817dd60550e73319e651184d9c2f9e17fb4d6002b1604d1f7f5dea6ecc6ad34fe1c3389ff7dc823e4d124a3bd",
+    "role": "CUSTOMER",
+    "id": "c88dd93c-a499-4cf5-9cd7-05b203b43925",
+    "createdAt": "2026-04-06T03:10:30.492Z"
+  }
+]
