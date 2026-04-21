@@ -1,21 +1,21 @@
 import assert from "assert/strict";
 import test from "node:test";
 
-import { BookingRepository } from "../../src/repositories/BookingRepository";
-import { ServiceRepository } from "../../src/repositories/ServiceRepository";
-import { UserRepository } from "../../src/repositories/UserRepository";
-import { AdminService } from "../../src/services/AdminService";
-import { BookingService } from "../../src/services/BookingService";
+import { createBookingRepository } from "../../src/repositories/BookingRepository";
+import { createServiceRepository } from "../../src/repositories/ServiceRepository";
+import { createUserRepository } from "../../src/repositories/UserRepository";
+import { createAdminService } from "../../src/services/AdminService";
+import { createBookingService } from "../../src/services/BookingService";
 import { setupTestEnvironment } from "../helpers/testUtils";
 
 function createServices() {
-  const bookingRepository = new BookingRepository();
-  const serviceRepository = new ServiceRepository();
-  const userRepository = new UserRepository();
+  const bookingRepository = createBookingRepository();
+  const serviceRepository = createServiceRepository();
+  const userRepository = createUserRepository();
 
   return {
-    adminService: new AdminService(bookingRepository, serviceRepository, userRepository),
-    bookingService: new BookingService(bookingRepository, serviceRepository, userRepository),
+    adminService: createAdminService(bookingRepository, serviceRepository, userRepository),
+    bookingService: createBookingService(bookingRepository, serviceRepository, userRepository),
   };
 }
 
@@ -119,6 +119,69 @@ test("AdminService rejects incomplete service changes and unknown services for s
           capacity: 1,
         }),
       /Service not found/i,
+    );
+  } finally {
+    testEnvironment.cleanup();
+  }
+});
+
+test("AdminService covers missing bookings, invalid slot combinations, and capacity conflicts", () => {
+  const testEnvironment = setupTestEnvironment();
+
+  try {
+    const { adminService, bookingService } = createServices();
+
+    assert.throws(
+      () =>
+        adminService.updateBookingStatus(
+          "missing-booking",
+          { status: "CONFIRMED" },
+          "user-admin-1",
+        ),
+      /Booking not found/i,
+    );
+
+    assert.throws(
+      () => adminService.editBooking("missing-booking", { notes: "No booking here" }),
+      /Booking not found/i,
+    );
+
+    bookingService.createBooking({
+      serviceId: "svc-hair-styling",
+      timeSlotId: "slot-101",
+      guestName: "First Capacity Guest",
+      guestEmail: "capacity-1@example.com",
+    });
+
+    bookingService.createBooking({
+      serviceId: "svc-hair-styling",
+      timeSlotId: "slot-101",
+      guestName: "Second Capacity Guest",
+      guestEmail: "capacity-2@example.com",
+    });
+
+    const movableBooking = bookingService.createBooking({
+      serviceId: "svc-hair-styling",
+      timeSlotId: "slot-100",
+      guestName: "Third Capacity Guest",
+      guestEmail: "capacity-3@example.com",
+    });
+
+    assert.throws(
+      () =>
+        adminService.editBooking(movableBooking.id, {
+          serviceId: "svc-relax-massage",
+          timeSlotId: "slot-101",
+        }),
+      /invalid/i,
+    );
+
+    assert.throws(
+      () =>
+        adminService.editBooking(movableBooking.id, {
+          timeSlotId: "slot-101",
+        }),
+      /remaining capacity/i,
     );
   } finally {
     testEnvironment.cleanup();

@@ -1,43 +1,43 @@
 import express from "express";
 
 import { initializeDatabase } from "./config/database";
-import { AdminController } from "./controllers/AdminController";
-import { AuthController } from "./controllers/AuthController";
-import { BookingController } from "./controllers/BookingController";
+import { createAdminController } from "./controllers/AdminController";
+import { createAuthController } from "./controllers/AuthController";
+import { createBookingController } from "./controllers/BookingController";
 import { errorHandler } from "./middleware/errorHandler";
 import { requestLogger } from "./middleware/requestLogger";
-import { BookingRepository } from "./repositories/BookingRepository";
-import { ServiceRepository } from "./repositories/ServiceRepository";
-import { UserRepository } from "./repositories/UserRepository";
+import { createBookingRepository } from "./repositories/BookingRepository";
+import { createServiceRepository } from "./repositories/ServiceRepository";
+import { createUserRepository } from "./repositories/UserRepository";
 import { buildAdminRoutes } from "./routes/admin.routes";
 import { buildAuthRoutes } from "./routes/auth.routes";
 import { buildBookingRoutes } from "./routes/booking.routes";
-import { AdminService } from "./services/AdminService";
-import { AuthService } from "./services/AuthService";
-import { BookingService } from "./services/BookingService";
+import { createAdminService } from "./services/AdminService";
+import { createAuthService } from "./services/AuthService";
+import { createBookingService } from "./services/BookingService";
 
 export function createApp() {
   initializeDatabase();
 
-  const userRepository = new UserRepository();
-  const serviceRepository = new ServiceRepository();
-  const bookingRepository = new BookingRepository();
+  const userRepository = createUserRepository();
+  const serviceRepository = createServiceRepository();
+  const bookingRepository = createBookingRepository();
 
-  const authService = new AuthService(userRepository);
-  const bookingService = new BookingService(
+  const authService = createAuthService(userRepository);
+  const bookingService = createBookingService(
     bookingRepository,
     serviceRepository,
     userRepository,
   );
-  const adminService = new AdminService(
+  const adminService = createAdminService(
     bookingRepository,
     serviceRepository,
     userRepository,
   );
 
-  const authController = new AuthController(authService);
-  const bookingController = new BookingController(bookingService);
-  const adminController = new AdminController(adminService);
+  const authController = createAuthController(authService);
+  const bookingController = createBookingController(bookingService);
+  const adminController = createAdminController(adminService);
 
   const app = express();
 

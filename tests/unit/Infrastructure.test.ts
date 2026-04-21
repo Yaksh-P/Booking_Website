@@ -5,6 +5,12 @@ import test from "node:test";
 
 import { errorHandler } from "../../src/middleware/errorHandler";
 import { authenticate, authenticateOptional } from "../../src/middleware/authenticate";
+import {
+  getDataDirectory,
+  initializeDatabase,
+  readCollection,
+  writeCollection,
+} from "../../src/config/database";
 import { authorize } from "../../src/middleware/authorize";
 import { logger } from "../../src/config/logger";
 import { signToken, verifyToken } from "../../src/config/jwt";
@@ -14,6 +20,8 @@ test("JWT helpers, middleware, logger, and error handling cover infrastructure b
   const testEnvironment = setupTestEnvironment();
 
   try {
+    logger.info("Test-mode log branch");
+
     const validToken = signToken({
       sub: "user-1",
       email: "user@example.com",
@@ -113,6 +121,30 @@ test("JWT helpers, middleware, logger, and error handling cover infrastructure b
     const logDirectory = process.env.LOG_DIRECTORY ?? "";
     assert.equal(fs.existsSync(path.join(logDirectory, "application.log")), true);
     assert.equal(fs.existsSync(path.join(logDirectory, "errors.log")), true);
+
+    const dataDirectory = getDataDirectory();
+    const usersPath = path.join(dataDirectory, "users.json");
+    const originalUsersRaw = fs.readFileSync(usersPath, "utf-8");
+    initializeDatabase();
+    assert.equal(fs.readFileSync(usersPath, "utf-8"), originalUsersRaw);
+
+    const users = readCollection<{ id: string }>("users");
+    writeCollection("users", [...users, { id: "user-extra" }]);
+    assert.equal(readCollection<{ id: string }>("users").some((user) => user.id === "user-extra"), true);
+
+    const originalDataDirectory = process.env.DATA_DIRECTORY;
+    const originalLogDirectory = process.env.LOG_DIRECTORY;
+    delete process.env.DATA_DIRECTORY;
+    delete process.env.LOG_DIRECTORY;
+
+    const fallbackDataDirectory = getDataDirectory();
+    assert.match(fallbackDataDirectory, /database[\\/]data$/i);
+
+    logger.info("Fallback log directory branch");
+    assert.equal(fs.existsSync(path.resolve("logs", "application.log")), true);
+
+    process.env.DATA_DIRECTORY = originalDataDirectory;
+    process.env.LOG_DIRECTORY = originalLogDirectory;
 
     const response = {
       statusCode: 0,

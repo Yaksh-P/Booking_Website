@@ -2,22 +2,20 @@ import { BookingStatus } from "../entities/Booking";
 import { BookingRepository } from "../repositories/BookingRepository";
 import { ServiceRepository } from "../repositories/ServiceRepository";
 import { UserRepository } from "../repositories/UserRepository";
-import { AppError } from "../utils/AppError";
+import { createAppError } from "../utils/AppError";
 import { paginate } from "../utils/pagination";
 
-export class AdminService {
-  constructor(
-    private readonly bookingRepository: BookingRepository,
-    private readonly serviceRepository: ServiceRepository,
-    private readonly userRepository: UserRepository,
-  ) {}
-
-  listBookings(query: { page: number; pageSize: number; status?: string }) {
+export function createAdminService(
+  bookingRepository: BookingRepository,
+  serviceRepository: ServiceRepository,
+  userRepository: UserRepository,
+) {
+  const listBookings = (query: { page: number; pageSize: number; status?: string }) => {
     const status = query.status as BookingStatus | undefined;
-    const bookings = this.bookingRepository.listByStatus(status).map((booking) => ({
+    const bookings = bookingRepository.listByStatus(status).map((booking) => ({
       ...booking,
-      service: this.serviceRepository.findById(booking.serviceId),
-      timeSlot: this.serviceRepository.findTimeSlotById(booking.timeSlotId),
+      service: serviceRepository.findById(booking.serviceId),
+      timeSlot: serviceRepository.findTimeSlotById(booking.timeSlotId),
     }));
 
     const offset = (query.page - 1) * query.pageSize;
@@ -27,20 +25,20 @@ export class AdminService {
       page: query.page,
       limit: query.pageSize,
     });
-  }
+  };
 
-  updateBookingStatus(
+  const updateBookingStatus = (
     bookingId: string,
     payload: { status: string; adminNotes?: string },
     updatedBy: string,
-  ) {
-    const booking = this.bookingRepository.findById(bookingId);
+  ) => {
+    const booking = bookingRepository.findById(bookingId);
 
     if (!booking) {
-      throw new AppError("Booking not found.", 404);
+      throw createAppError("Booking not found.", 404);
     }
 
-    const updatedBooking = this.bookingRepository.update(bookingId, {
+    const updatedBooking = bookingRepository.update(bookingId, {
       status: payload.status as BookingStatus,
       adminNotes: payload.adminNotes
         ? `${payload.adminNotes} (updated by ${updatedBy})`
@@ -48,13 +46,13 @@ export class AdminService {
     });
 
     if (!updatedBooking) {
-      throw new AppError("Booking could not be updated.", 500);
+      throw createAppError("Booking could not be updated.", 500);
     }
 
     return updatedBooking;
-  }
+  };
 
-  editBooking(
+  const editBooking = (
     bookingId: string,
     payload: {
       serviceId?: string;
@@ -65,34 +63,32 @@ export class AdminService {
       notes?: string;
       adminNotes?: string;
     },
-  ) {
-    const booking = this.bookingRepository.findById(bookingId);
+  ) => {
+    const booking = bookingRepository.findById(bookingId);
 
     if (!booking) {
-      throw new AppError("Booking not found.", 404);
+      throw createAppError("Booking not found.", 404);
     }
 
     const nextServiceId = payload.serviceId ?? booking.serviceId;
     const nextTimeSlotId = payload.timeSlotId ?? booking.timeSlotId;
 
     if (payload.serviceId && !payload.timeSlotId) {
-      throw new AppError("timeSlotId must also be supplied when serviceId changes.", 400);
+      throw createAppError("timeSlotId must also be supplied when serviceId changes.", 400);
     }
 
-    const service = this.serviceRepository.findById(nextServiceId);
-    const timeSlot = this.serviceRepository.findTimeSlotById(nextTimeSlotId);
+    const service = serviceRepository.findById(nextServiceId);
+    const timeSlot = serviceRepository.findTimeSlotById(nextTimeSlotId);
 
     if (!service || !timeSlot || timeSlot.serviceId !== nextServiceId) {
-      throw new AppError("The supplied service and time slot combination is invalid.", 400);
+      throw createAppError("The supplied service and time slot combination is invalid.", 400);
     }
 
-    if (
-      this.bookingRepository.countActiveByTimeSlot(nextTimeSlotId, booking.id) >= timeSlot.capacity
-    ) {
-      throw new AppError("The selected time slot does not have remaining capacity.", 409);
+    if (bookingRepository.countActiveByTimeSlot(nextTimeSlotId, booking.id) >= timeSlot.capacity) {
+      throw createAppError("The selected time slot does not have remaining capacity.", 409);
     }
 
-    const updatedBooking = this.bookingRepository.update(bookingId, {
+    const updatedBooking = bookingRepository.update(bookingId, {
       serviceId: nextServiceId,
       timeSlotId: nextTimeSlotId,
       guestName: payload.guestName ?? booking.guestName,
@@ -103,32 +99,32 @@ export class AdminService {
     });
 
     if (!updatedBooking) {
-      throw new AppError("Booking could not be updated.", 500);
+      throw createAppError("Booking could not be updated.", 500);
     }
 
     return updatedBooking;
-  }
+  };
 
-  createTimeSlot(payload: {
+  const createTimeSlot = (payload: {
     serviceId: string;
     date: string;
     startTime: string;
     endTime: string;
     capacity: number;
-  }) {
-    const service = this.serviceRepository.findById(payload.serviceId);
+  }) => {
+    const service = serviceRepository.findById(payload.serviceId);
 
     if (!service) {
-      throw new AppError("Service not found.", 404);
+      throw createAppError("Service not found.", 404);
     }
 
-    return this.serviceRepository.createTimeSlot(payload);
-  }
+    return serviceRepository.createTimeSlot(payload);
+  };
 
-  getAnalytics() {
-    const users = this.userRepository.list();
-    const bookings = this.bookingRepository.list();
-    const services = this.serviceRepository.listServices();
+  const getAnalytics = () => {
+    const users = userRepository.list();
+    const bookings = bookingRepository.list();
+    const services = serviceRepository.listServices();
 
     return {
       totalUsers: users.length,
@@ -147,5 +143,15 @@ export class AdminService {
         totalBookings: bookings.filter((booking) => booking.serviceId === service.id).length,
       })),
     };
-  }
+  };
+
+  return {
+    listBookings,
+    updateBookingStatus,
+    editBooking,
+    createTimeSlot,
+    getAnalytics,
+  };
 }
+
+export type AdminService = ReturnType<typeof createAdminService>;

@@ -9,29 +9,27 @@ import { AuthenticatedRequest } from "../middleware/authenticate";
 import { ValidatedRequest } from "../middleware/validate";
 import { BookingService } from "../services/BookingService";
 
-export class BookingController {
-  constructor(private readonly bookingService: BookingService) {}
-
-  listServices = (_req: AuthenticatedRequest, res: Response) => {
+export function createBookingController(bookingService: BookingService) {
+  const listServices = (_req: AuthenticatedRequest, res: Response) => {
     res.status(200).json({
       success: true,
-      data: this.bookingService.listServices(),
+      data: bookingService.listServices(),
     });
   };
 
-  getAvailability = (req: AuthenticatedRequest, res: Response) => {
+  const getAvailability = (req: AuthenticatedRequest, res: Response) => {
     const query = parseAvailabilityQuery(req.query);
 
     res.status(200).json({
       success: true,
-      data: this.bookingService.getAvailability(query),
+      data: bookingService.getAvailability(query),
     });
   };
 
-  createBooking = (req: AuthenticatedRequest & ValidatedRequest, res: Response) => {
+  const createBooking = (req: AuthenticatedRequest & ValidatedRequest, res: Response) => {
     const payload = req.validated as ReturnType<typeof parseCreateBookingRequest>;
 
-    const booking = this.bookingService.createBooking(payload, req.currentUser);
+    const booking = bookingService.createBooking(payload, req.currentUser);
 
     res.status(201).json({
       success: true,
@@ -40,8 +38,8 @@ export class BookingController {
     });
   };
 
-  listMyBookings = (req: AuthenticatedRequest, res: Response) => {
-    const bookings = this.bookingService.listBookingsForUser(req.currentUser?.sub ?? "");
+  const listMyBookings = (req: AuthenticatedRequest, res: Response) => {
+    const bookings = bookingService.listBookingsForUser(req.currentUser?.sub ?? "");
 
     res.status(200).json({
       success: true,
@@ -49,8 +47,8 @@ export class BookingController {
     });
   };
 
-  lookupGuestBooking = (req: AuthenticatedRequest, res: Response) => {
-    const booking = this.bookingService.lookupGuestBooking(
+  const lookupGuestBooking = (req: AuthenticatedRequest, res: Response) => {
+    const booking = bookingService.lookupGuestBooking(
       String(req.params.reference ?? ""),
       String(req.query.email ?? ""),
     );
@@ -61,9 +59,9 @@ export class BookingController {
     });
   };
 
-  cancelBooking = (req: AuthenticatedRequest & ValidatedRequest, res: Response) => {
+  const cancelBooking = (req: AuthenticatedRequest & ValidatedRequest, res: Response) => {
     const payload = req.validated as ReturnType<typeof parseCancelBookingRequest>;
-    const booking = this.bookingService.cancelBooking(String(req.params.id ?? ""), {
+    const booking = bookingService.cancelBooking(String(req.params.id ?? ""), {
       userId: req.currentUser?.sub,
       guestEmail: payload.guestEmail,
     });
@@ -74,4 +72,15 @@ export class BookingController {
       data: booking,
     });
   };
+
+  return {
+    listServices,
+    getAvailability,
+    createBooking,
+    listMyBookings,
+    lookupGuestBooking,
+    cancelBooking,
+  };
 }
+
+export type BookingController = ReturnType<typeof createBookingController>;

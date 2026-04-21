@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 
 import { logger } from "../config/logger";
-import { AppError } from "../utils/AppError";
+import { isAppError } from "../utils/AppError";
 
 export function errorHandler(
   error: Error,
@@ -9,7 +9,7 @@ export function errorHandler(
   response: Response,
   _next: NextFunction,
 ) {
-  const isOperationalError = error instanceof AppError;
+  const isOperationalError = isAppError(error);
   const statusCode = isOperationalError ? error.statusCode : 500;
 
   logger.error(error.message, {

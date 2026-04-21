@@ -1,17 +1,17 @@
 import assert from "assert/strict";
 import test from "node:test";
 
-import { BookingRepository } from "../../src/repositories/BookingRepository";
-import { ServiceRepository } from "../../src/repositories/ServiceRepository";
-import { UserRepository } from "../../src/repositories/UserRepository";
-import { BookingService } from "../../src/services/BookingService";
+import { createBookingRepository } from "../../src/repositories/BookingRepository";
+import { createServiceRepository } from "../../src/repositories/ServiceRepository";
+import { createUserRepository } from "../../src/repositories/UserRepository";
+import { createBookingService } from "../../src/services/BookingService";
 import { setupTestEnvironment } from "../helpers/testUtils";
 
-function createBookingService() {
-  return new BookingService(
-    new BookingRepository(),
-    new ServiceRepository(),
-    new UserRepository(),
+function createTestBookingService() {
+  return createBookingService(
+    createBookingRepository(),
+    createServiceRepository(),
+    createUserRepository(),
   );
 }
 
@@ -19,7 +19,7 @@ test("BookingService returns availability and decreases remaining capacity after
   const testEnvironment = setupTestEnvironment();
 
   try {
-    const bookingService = createBookingService();
+    const bookingService = createTestBookingService();
 
     const beforeBooking = bookingService.getAvailability({ serviceId: "svc-hair-styling" });
     const slotBefore = beforeBooking[0]?.slots.find((slot) => slot.id === "slot-100");
@@ -46,7 +46,7 @@ test("BookingService prevents overbooking when a time slot is full", () => {
   const testEnvironment = setupTestEnvironment();
 
   try {
-    const bookingService = createBookingService();
+    const bookingService = createTestBookingService();
 
     bookingService.createBooking({
       serviceId: "svc-relax-massage",
@@ -74,7 +74,7 @@ test("BookingService lets a registered user list and cancel their own booking", 
   const testEnvironment = setupTestEnvironment();
 
   try {
-    const bookingService = createBookingService();
+    const bookingService = createTestBookingService();
 
     const booking = bookingService.createBooking(
       {
@@ -107,7 +107,7 @@ test("BookingService validates guest details and guest lookup input", () => {
   const testEnvironment = setupTestEnvironment();
 
   try {
-    const bookingService = createBookingService();
+    const bookingService = createTestBookingService();
 
     assert.throws(
       () =>
@@ -131,7 +131,7 @@ test("BookingService handles invalid service selections and unauthorized cancell
   const testEnvironment = setupTestEnvironment();
 
   try {
-    const bookingService = createBookingService();
+    const bookingService = createTestBookingService();
 
     assert.throws(
       () =>

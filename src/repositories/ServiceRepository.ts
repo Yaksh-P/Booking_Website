@@ -9,23 +9,18 @@ interface TimeSlotFilters {
   date?: string;
 }
 
-export class ServiceRepository {
-  listServices() {
-    return readCollection<Service>("services").sort((left, right) =>
+export function createServiceRepository() {
+  const listServices = () =>
+    readCollection<Service>("services").sort((left, right) =>
       left.name.localeCompare(right.name),
     );
-  }
 
-  listActiveServices() {
-    return this.listServices().filter((service) => service.isActive);
-  }
+  const listActiveServices = () => listServices().filter((service) => service.isActive);
 
-  findById(id: string) {
-    return this.listServices().find((service) => service.id === id);
-  }
+  const findById = (id: string) => listServices().find((service) => service.id === id);
 
-  listTimeSlots(filters?: TimeSlotFilters) {
-    return readCollection<TimeSlot>("timeSlots")
+  const listTimeSlots = (filters?: TimeSlotFilters) =>
+    readCollection<TimeSlot>("timeSlots")
       .filter((timeSlot) => {
         if (filters?.serviceId && timeSlot.serviceId !== filters.serviceId) {
           return false;
@@ -40,14 +35,12 @@ export class ServiceRepository {
       .sort((left, right) =>
         `${left.date}-${left.startTime}`.localeCompare(`${right.date}-${right.startTime}`),
       );
-  }
 
-  findTimeSlotById(id: string) {
-    return this.listTimeSlots().find((timeSlot) => timeSlot.id === id);
-  }
+  const findTimeSlotById = (id: string) =>
+    listTimeSlots().find((timeSlot) => timeSlot.id === id);
 
-  createTimeSlot(timeSlot: Omit<TimeSlot, "id" | "createdAt">) {
-    const timeSlots = this.listTimeSlots();
+  const createTimeSlot = (timeSlot: Omit<TimeSlot, "id" | "createdAt">) => {
+    const timeSlots = listTimeSlots();
 
     const createdTimeSlot: TimeSlot = {
       ...timeSlot,
@@ -59,5 +52,16 @@ export class ServiceRepository {
     writeCollection("timeSlots", timeSlots);
 
     return createdTimeSlot;
-  }
+  };
+
+  return {
+    listServices,
+    listActiveServices,
+    findById,
+    listTimeSlots,
+    findTimeSlotById,
+    createTimeSlot,
+  };
 }
+
+export type ServiceRepository = ReturnType<typeof createServiceRepository>;

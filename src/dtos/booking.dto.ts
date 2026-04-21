@@ -1,8 +1,8 @@
-import { AppError } from "../utils/AppError";
+import { createAppError } from "../utils/AppError";
 
 function ensureString(value: unknown, fieldName: string) {
   if (typeof value !== "string" || value.trim().length === 0) {
-    throw new AppError(`${fieldName} is required.`, 400);
+    throw createAppError(`${fieldName} is required.`, 400);
   }
 
   return value.trim();
@@ -14,7 +14,7 @@ function ensureOptionalString(value: unknown) {
   }
 
   if (typeof value !== "string") {
-    throw new AppError("Optional fields must be strings when provided.", 400);
+    throw createAppError("Optional fields must be strings when provided.", 400);
   }
 
   return value.trim();
@@ -23,7 +23,7 @@ function ensureOptionalString(value: unknown) {
 function ensureEmail(value: unknown, fieldName: string) {
   const email = ensureString(value, fieldName).toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    throw new AppError(`${fieldName} must be a valid email address.`, 400);
+    throw createAppError(`${fieldName} must be a valid email address.`, 400);
   }
   return email;
 }
@@ -31,7 +31,7 @@ function ensureEmail(value: unknown, fieldName: string) {
 function ensureDate(value: unknown, fieldName: string) {
   const date = ensureString(value, fieldName);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    throw new AppError(`${fieldName} must be in YYYY-MM-DD format.`, 400);
+    throw createAppError(`${fieldName} must be in YYYY-MM-DD format.`, 400);
   }
   return date;
 }

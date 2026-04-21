@@ -3,23 +3,19 @@ import { randomUUID } from "crypto";
 import { readCollection, writeCollection } from "../config/database";
 import { User } from "../entities/User";
 
-export class UserRepository {
-  list() {
-    return readCollection<User>("users").sort((left, right) =>
+export function createUserRepository() {
+  const list = () =>
+    readCollection<User>("users").sort((left, right) =>
       left.createdAt.localeCompare(right.createdAt),
     );
-  }
 
-  findById(id: string) {
-    return this.list().find((user) => user.id === id);
-  }
+  const findById = (id: string) => list().find((user) => user.id === id);
 
-  findByEmail(email: string) {
-    return this.list().find((user) => user.email === email.toLowerCase());
-  }
+  const findByEmail = (email: string) =>
+    list().find((user) => user.email === email.toLowerCase());
 
-  create(user: Omit<User, "id" | "createdAt">) {
-    const users = this.list();
+  const create = (user: Omit<User, "id" | "createdAt">) => {
+    const users = list();
 
     const createdUser: User = {
       ...user,
@@ -31,5 +27,14 @@ export class UserRepository {
     writeCollection("users", users);
 
     return createdUser;
-  }
+  };
+
+  return {
+    list,
+    findById,
+    findByEmail,
+    create,
+  };
 }
+
+export type UserRepository = ReturnType<typeof createUserRepository>;

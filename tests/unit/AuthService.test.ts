@@ -1,16 +1,16 @@
 import assert from "assert/strict";
 import test from "node:test";
 
-import { UserRepository } from "../../src/repositories/UserRepository";
-import { AuthService } from "../../src/services/AuthService";
+import { createUserRepository } from "../../src/repositories/UserRepository";
+import { createAuthService } from "../../src/services/AuthService";
 import { setupTestEnvironment } from "../helpers/testUtils";
 
 test("AuthService registers a new customer and stores a hashed password", () => {
   const testEnvironment = setupTestEnvironment();
 
   try {
-    const userRepository = new UserRepository();
-    const authService = new AuthService(userRepository);
+    const userRepository = createUserRepository();
+    const authService = createAuthService(userRepository);
 
     const result = authService.register({
       name: "Maria Student",
@@ -33,7 +33,7 @@ test("AuthService rejects an invalid login password", () => {
   const testEnvironment = setupTestEnvironment();
 
   try {
-    const authService = new AuthService(new UserRepository());
+    const authService = createAuthService(createUserRepository());
 
     assert.throws(
       () =>

@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 
-import { AppError } from "../utils/AppError";
+import { createAppError } from "../utils/AppError";
 
 export interface AuthTokenPayload {
   sub: string;
@@ -57,7 +57,7 @@ export function signToken(
 export function verifyToken(token: string) {
   const segments = token.split(".");
   if (segments.length !== 3) {
-    throw new AppError("Authentication token format is invalid.", 401);
+    throw createAppError("Authentication token format is invalid.", 401);
   }
 
   const header = segments[0]!;
@@ -72,7 +72,7 @@ export function verifyToken(token: string) {
     expectedBuffer.length !== actualBuffer.length ||
     !timingSafeEqual(expectedBuffer, actualBuffer)
   ) {
-    throw new AppError("Authentication token is invalid.", 401);
+    throw createAppError("Authentication token is invalid.", 401);
   }
 
   const payload = JSON.parse(
@@ -80,7 +80,7 @@ export function verifyToken(token: string) {
   ) as AuthTokenPayload;
 
   if (payload.exp <= Math.floor(Date.now() / 1000)) {
-    throw new AppError("Authentication token has expired.", 401);
+    throw createAppError("Authentication token has expired.", 401);
   }
 
   return payload;
